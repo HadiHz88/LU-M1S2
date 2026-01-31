@@ -25,7 +25,7 @@ All content is structured by course code and title for easy navigation.
 | IN410 | Cryptography & Secure Communication | 5 |
 | IN411 | Introduction to Big Data | 3 |
 | IN440 | Natural Language Processing | 5 |
-| IN441 | Distributed Systems Development | 5 |
+| IN441 | Distributed Systems Programming | 5 |
 | IN444 | Internet of Things | 5 |
 | IN448 | Applied System Development | 5 |
 | LAN400 | Written & Oral Expression | 2 |
