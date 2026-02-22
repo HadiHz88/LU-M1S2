@@ -105,3 +105,16 @@
 # Specific ignored files
 # =========================
 *.mp4
+
+# =========================
+# Python (if applicable)
+# =========================
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.pytest_cache/
+**/.mypy_cache/
+**/.venv/
+**/venv/
+**/env/
+**/.env/
