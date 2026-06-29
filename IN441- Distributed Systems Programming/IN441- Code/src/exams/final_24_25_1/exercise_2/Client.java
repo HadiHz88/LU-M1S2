@@ -8,6 +8,7 @@ import java.net.Socket;
 
 public class Client {
     public static void main(String[] args) throws IOException {
+        // Step 1: connect to the TCP server.
         Socket socket = new Socket("localhost", 9876);
 
         BufferedReader input = new BufferedReader(
@@ -20,6 +21,7 @@ public class Client {
 
         PrintWriter toServer = new PrintWriter(socket.getOutputStream(), true);
 
+        // Step 2: send the login credentials.
         System.out.println("Enter your username");
         String username = input.readLine();
 
@@ -32,17 +34,19 @@ public class Client {
 
         String res = fromServer.readLine();
 
+        // Step 3: stop if the server rejects the login.
         if (res.equals("fail")) {
             System.out.println("Invalid Credentials, ending connection...");
             socket.close();
             return;
         }
 
-        System.out.println("Connection Successful, please enter your command and input");
+        System.out.println("Connection Successful, please enter your commands");
 
+        // Step 4: send commands until the user enters BYE.
         while (true) {
-            System.out.println("Enter command (ADD, MAX, BYE for ending)");
-            String cmd = input.readLine();
+            System.out.println("Enter command (ADD x y, MAX x y, BYE for ending)");
+            String cmd = input.readLine().trim();
 
             if (cmd.equalsIgnoreCase("BYE")) {
                 toServer.println("BYE");
@@ -50,14 +54,7 @@ public class Client {
                 break;
             }
 
-            System.out.println("Enter X");
-            String x = input.readLine();
-
-            System.out.println("Enter Y");
-            String y = input.readLine();
-
-            String request = cmd + ":" + x + ":" + y;
-
+            String request = cmd.replaceAll("\\s+", ":");
             toServer.println(request);
 
             String operationResult = fromServer.readLine();

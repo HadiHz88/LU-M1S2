@@ -16,79 +16,90 @@ public class ServerHandler extends Thread {
 
     @Override
     public void run() {
-        try {
+        try (
+                Socket socket = client;
+                BufferedReader fromClient = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream())
+                );
+                PrintWriter output = new PrintWriter(socket.getOutputStream(), true)
+        ) {
             System.out.println("Starting operation for client " + client.getInetAddress());
 
-            BufferedReader fromClient = new BufferedReader(
-                    new InputStreamReader(client.getInputStream())
-            );
-
-            PrintWriter output = new PrintWriter(client.getOutputStream(), true);
-
+            // Step 4: read and validate the login request.
             String loginInput = fromClient.readLine();
 
             if (loginInput == null) {
-                client.close();
                 return;
             }
 
             System.out.println("Reading from client: " + loginInput);
 
-            String[] usernameAndPass = formatInput(loginInput);
+            String[] usernameAndPass = formatLogin(loginInput);
 
             if (usernameAndPass.length != 2 || !authenticate(usernameAndPass[0], usernameAndPass[1])) {
                 output.println("fail");
-                client.close();
                 return;
             }
 
             output.println("success");
 
+            // Step 5: process commands until the client sends BYE.
             String input;
-
             while ((input = fromClient.readLine()) != null) {
-                String[] parts = formatInput(input);
-
-                String cmd = parts[0].toUpperCase();
-
-                if (cmd.equals("BYE")) {
+                if (isBye(input)) {
                     output.println("bye");
                     break;
                 }
 
-                if (parts.length != 3) {
-                    output.println("Invalid input format");
-                    continue;
-                }
-
-                int response = doOperation(cmd, parts[1], parts[2]);
-
-                output.println(response);
+                output.println(processCommand(input));
             }
 
-            client.close();
-
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Error while handling client: " + e.getMessage());
         }
     }
 
-    private String[] formatInput(String input) {
-        return input.split(":");
+    static String processCommand(String input) {
+        String[] parts = formatCommand(input);
+
+        if (parts.length != 3) {
+            return "ERROR: Invalid input format";
+        }
+
+        try {
+            int response = doOperation(parts[0], parts[1], parts[2]);
+            return String.valueOf(response);
+        } catch (NumberFormatException e) {
+            return "ERROR: x and y must be integers";
+        } catch (IllegalArgumentException e) {
+            return "ERROR: " + e.getMessage();
+        }
     }
 
-    private int doOperation(String cmd, String x, String y) {
+    private static boolean isBye(String input) {
+        return input.trim().equalsIgnoreCase("BYE");
+    }
+
+    private static String[] formatLogin(String input) {
+        return input.split(":", 2);
+    }
+
+    private static String[] formatCommand(String input) {
+        return input.trim().split("[\\s:]+");
+    }
+
+    private static int doOperation(String cmd, String x, String y) {
         int numX = Integer.parseInt(x);
         int numY = Integer.parseInt(y);
 
-        return switch (cmd) {
+        return switch (cmd.trim().toUpperCase()) {
             case "ADD" -> numX + numY;
             case "MAX" -> Math.max(numX, numY);
-            default -> Integer.MIN_VALUE;
+            default -> throw new IllegalArgumentException("Invalid command");
         };
     }
 
     private boolean authenticate(String username, String password) {
-        return Server.userList.contains(new Server.User(username, password));
+        return password.equals(Server.users.get(username));
     }
 }
