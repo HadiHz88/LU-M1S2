@@ -9,11 +9,9 @@ import java.net.InetAddress;
 public class Client {
 
     public static void main(String[] args) throws Exception {
-
+        // Step 1: create the client UDP socket.
         DatagramSocket clientSocket = new DatagramSocket();
-
-        BufferedReader input =
-                new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 
         System.out.println("Choose one of the following operations:");
         System.out.println("UPPER");
@@ -26,8 +24,8 @@ public class Client {
         System.out.print("Enter your choice: ");
         String cmd = input.readLine();
 
-        String msg = word + ":" + cmd;
-
+        // Step 2: send COMMAND:message to the server.
+        String msg = cmd.trim().toUpperCase() + ":" + word;
         byte[] toServer = msg.getBytes();
 
         DatagramPacket req = new DatagramPacket(
@@ -38,14 +36,14 @@ public class Client {
 
         clientSocket.send(req);
 
+        // Step 3: wait for the server response.
         byte[] fromServer = new byte[1024];
-
         DatagramPacket response = new DatagramPacket(fromServer, fromServer.length);
 
         clientSocket.receive(response);
 
+        // Step 4: display the result.
         String result = new String(response.getData(), 0, response.getLength());
-
         System.out.println("Your result is: " + result);
 
         clientSocket.close();

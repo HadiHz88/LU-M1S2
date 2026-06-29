@@ -4,8 +4,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 public class ServerHelper extends Thread {
-    private DatagramSocket socket;
-    private DatagramPacket packet;
+    private final DatagramSocket socket;
+    private final DatagramPacket packet;
 
     ServerHelper(
             DatagramSocket socket,
@@ -18,13 +18,14 @@ public class ServerHelper extends Thread {
     @Override
     public void run() {
         try {
+            // Step 4: convert the UDP packet to a string request.
             String message = new String(packet.getData(), 0, packet.getLength());
 
-            String[] parts = formatMessage(message);
-            String response = commandOperation(parts[0], parts[1]);
-
+            // Step 5: perform the requested operation.
+            String response = processRequest(message);
             byte[] responseBytes = response.getBytes();
 
+            // Step 6: send the response to the same client address and port.
             DatagramPacket reply =
                     new DatagramPacket(
                             responseBytes,
@@ -39,12 +40,21 @@ public class ServerHelper extends Thread {
     }
 
 
-    private String[] formatMessage(String message) {
-        return message.split(":");
+    static String processRequest(String message) {
+        String[] parts = formatMessage(message);
+        if (parts.length != 2) {
+            return "Invalid input format";
+        }
+
+        return commandOperation(parts[0], parts[1]);
     }
 
-    private String commandOperation(String msg, String command) {
-        return switch (command) {
+    private static String[] formatMessage(String message) {
+        return message.split(":", 2);
+    }
+
+    private static String commandOperation(String command, String msg) {
+        return switch (command.trim().toUpperCase()) {
             case "UPPER" -> msg.toUpperCase();
             case "REVERSE" -> new StringBuilder(msg).reverse().toString();
             case "LENGTH" -> String.valueOf(msg.length());
@@ -52,4 +62,3 @@ public class ServerHelper extends Thread {
         };
     }
 }
-
