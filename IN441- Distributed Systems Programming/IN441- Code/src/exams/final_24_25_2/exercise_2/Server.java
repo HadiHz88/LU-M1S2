@@ -10,7 +10,6 @@ public class Server {
 
     static {
         accounts.put("hadi", new Account("1234", 1000.00));
-        accounts.put("hanine", new Account("2222", 1500.00));
         accounts.put("messi", new Account("1010", 2000.00));
     }
 
