@@ -1,5 +1,10 @@
 # LU M1S2 - Course Materials, Summaries & Resources
 
+> [!WARNING]
+> **This repository is no longer maintained.** All Master 1, Semester 2 course content has moved to my website, where it is organized per course with a built-in viewer, downloads and practice quizzes: **[hadihz.me/courses](https://hadihz.me/courses)**.
+>
+> This repository is archived and kept read-only for reference. Please use the website for the latest materials.
+
 Hi, this is [Hadi](https://www.hadihz.me). This repository is a comprehensive collection of **course materials**, summaries, notes, and external resources for **Master Year 1**, Semester **2** courses at **Lebanese University, Hadath, academic year 2025/2026.** Materials are organized and lightly adjusted when needed to keep a clean structure and make everything easy to pull and update via Git.
 
 ---
